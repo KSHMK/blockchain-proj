@@ -1,16 +1,14 @@
 version: "3"
 
 services:
-  bc-nginx:
+  bc-front:
     image: nginx
-    container_name: bc-nginx
+    container_name: bc-front
     ports:
       - "8080:80"
     volumes:
+      - ./frontend/build/:/src
       - ./nginx.conf:/etc/nginx/conf.d/default.conf
-  bc-front:
-    build: ./frontend/
-    container_name: bc-front
   bc-back:
     build: ./backend/
     container_name: bc-back
