@@ -1,15 +1,13 @@
 version: "3"
 
 services:
-  bc-front:
+  blockchain:
     image: nginx
     container_name: bc-front
     ports:
       - "8080:80"
     volumes:
-      - ./frontend/build/:/src
+      - ./build/:/src
       - ./nginx.conf:/etc/nginx/conf.d/default.conf
-  bc-back:
-    build: ./backend/
-    container_name: bc-back
+
 
