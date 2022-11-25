@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useWeb3React } from '@web3-react/core';
 import { CONTRACT_ADDRESS, CONTRACT_ABI } from './config';
 import { fileRemove, fileUpload } from './FileManage';
@@ -16,22 +16,26 @@ const ContractUpload = () => {
   } = useWeb3React();
 
   const changeHandler = (event) => {
+    if(event.target.files[0] === undefined){
+      setIsSelected(false);
+      return;
+    }
     setSelectedFile(event.target.files[0]);
     setIsSelected(true);
   };
 
   async function upload(){
-    if(!active)
+    if(!active || !isSelected)
       return;
     
     let file = undefined;
     try{
-      file = await fileUpload(selectedFile);
+      setLog("File Uploading");
+      file = await fileUpload(selectedFile, (a,b) => {setLog((a.toString()))});
+      setLog("File Minting");
       const contract = new library.eth.Contract(CONTRACT_ABI, CONTRACT_ADDRESS, {from:account});
       const mint_price = await contract.methods.mintPrice().call();
-      console.log(mint_price);
-      const out = await contract.methods.addAudio(file.hash, file.key, file.path).send({value:mint_price});
-      console.log(out);
+      await contract.methods.addAudio(file.hash, file.key, file.path).send({value:mint_price});
     } catch(err) {
       console.log(err);
       if(file !== undefined)
