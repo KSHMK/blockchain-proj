@@ -1,19 +1,30 @@
 import { useState } from 'react';
-import { useWeb3React } from '@web3-react/core';
-import { CONTRACT_ADDRESS, CONTRACT_ABI } from './config';
-import { fileRemove, fileUpload } from './FileManage';
+import { fileUpload } from './FileManage';
 
-const ContractUpload = () => {
+import {
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
+  Button,
+  Progress,
+  Input,
+  Box,
+  Text,
+  Grid,
+  GridItem,
+} from '@chakra-ui/react'
 
-  const [log, setLog] = useState('');
+const ContractUpload = ({isOpen, onClose}) => {
+
+  const [progress, setProgress] = useState(0);
+  const [msg, setMsg] = useState('');
   const [selectedFile, setSelectedFile] = useState();
   const [isSelected, setIsSelected] = useState(false);
 
-  const {
-    library,
-    account,
-    active,
-  } = useWeb3React();
 
   const changeHandler = (event) => {
     if(event.target.files[0] === undefined){
@@ -24,49 +35,58 @@ const ContractUpload = () => {
     setIsSelected(true);
   };
 
+  function onCloseClick() {
+    onClose();
+    setMsg('');
+    setProgress(0);
+  }
+
+  function processLog(msg, p, toP) {
+    setMsg(msg);
+    setProgress((p/toP*100).toFixed());
+  }
+
   async function upload(){
-    if(!active || !isSelected)
+    if(!isSelected)
       return;
     
-    let file = undefined;
     try{
-      setLog("File Uploading");
-      file = await fileUpload(selectedFile, (a,b) => {setLog((a.toString()))});
-      setLog("File Minting");
-      const contract = new library.eth.Contract(CONTRACT_ABI, CONTRACT_ADDRESS, {from:account});
-      const mint_price = await contract.methods.mintPrice().call();
-      await contract.methods.addAudio(file.hash, file.key, file.path).send({value:mint_price});
+      await fileUpload(selectedFile, processLog);
     } catch(err) {
-      console.log(err);
-      if(file !== undefined)
-        await fileRemove(file.path);
-      setLog("upload failed");
+      setMsg("Failed");
       return;
     }
-    setLog("upload success");
+    setMsg("Success");
   }
 
   return (
-    <div>
-      <hr />
-      <p>Upload</p>
-      <input type="file" name="file" onChange={changeHandler} accept="audio/*" />
-            {isSelected ? (
-                <div>
-                    <p>Filename: {selectedFile.name}</p>
-                    <p>Filetype: {selectedFile.type}</p>
-                    <p>Size in bytes: {selectedFile.size}</p>
-                    <p>
-                        lastModifiedDate:{' '}
-                        {selectedFile.lastModifiedDate.toLocaleDateString()}
-                    </p>
-                </div>
-            ) : (
-                <p>Select a file to show details</p>
-            )}
-            <button type="button" onClick={upload}>Submit</button>
-      <p>{log}</p>
-    </div>
+    <Modal closeOnOverlayClick={false} isOpen={isOpen} onClose={onCloseClick}>
+      <ModalOverlay />
+      <ModalContent>
+        <ModalHeader>Upload Audio</ModalHeader>
+        <ModalCloseButton />
+        <ModalBody pb={6}>
+          <Box py={{base:5}}>
+            Upload File
+            <Input type="file" name="file" onChange={changeHandler} accept="audio/*" />
+          </Box>
+          <Box py={{base:5}}>
+          <Grid gap={4}>
+            <GridItem colSpan={1}><Text>{msg}</Text></GridItem> 
+            <GridItem colSpan={1}><Progress value={progress} size='lg'/></GridItem>
+          </Grid>
+          </Box>
+          
+        </ModalBody>
+
+        <ModalFooter>
+          <Button colorScheme='blue' mr={3} onClick={upload}>
+            Start Upload
+          </Button>
+          <Button onClick={onCloseClick}>Cancel</Button>
+        </ModalFooter>
+      </ModalContent>
+    </Modal>
   )
 }
 export default ContractUpload;

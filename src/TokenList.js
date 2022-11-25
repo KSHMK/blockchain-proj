@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { fileDownload } from './FileManage';
 import { getTokenList } from './ContractManage';
 
 import {
@@ -7,33 +6,34 @@ import {
   Table,
   Thead,
   Tbody,
-  Tfoot,
   Tr,
   Th,
   Td,
-  TableCaption,
-  TableContainer,
   Heading,
 } from '@chakra-ui/react'
 
-export const TokenListView = () => {
+export const TokenListView = ({listUpdateToggle, onOpenDownload, setDownTokenId}) => {
   
   const [list, setList] = useState([])
-  const [Log, setLog] = useState('')
   let flag=false;
 
+  async function clickRow(tokenId) {
+    setDownTokenId(tokenId);
+    onOpenDownload();
+  }
 
   async function viewList() {
     if(flag)
       return;
     flag = true;
-    const tlist = await getTokenList();
-    setList(tlist);
+    getTokenList()
+      .then((data) => {setList(data);})
+      .catch((err) => console.log(err));
   }
 
   useEffect(() => {
     viewList();
-  }, []);
+  }, [listUpdateToggle, viewList]);
 
   return (
     <Box 
@@ -46,8 +46,8 @@ export const TokenListView = () => {
         <Thead>
           <Tr>
             <Th>Token Id</Th>
+            <Th>Name</Th>
             <Th>Hash</Th>
-            <Th>URI</Th>
           </Tr>
         </Thead>
         <Tbody>
@@ -55,10 +55,10 @@ export const TokenListView = () => {
           list.length !== 0 ? 
             list.map((value, idx) => {
               return (
-                <Tr key={ idx } onClick={() => fileDownload(value.key, value.uri,(a,b) => {setLog((a/b*100).toFixed())})}>
+                <Tr key={ idx } onClick={() => clickRow(value.tokenId)}>
                   <Td>{ value.tokenId }</Td>
+                  <Td>{ value.name }</Td>
                   <Td>{ value.hash }</Td>
-                  <Td>{ value.uri }</Td>
                 </Tr>
               )
             })
@@ -70,3 +70,5 @@ export const TokenListView = () => {
     </Box>
   )
 }
+
+export default TokenListView

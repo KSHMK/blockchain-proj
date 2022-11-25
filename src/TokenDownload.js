@@ -1,6 +1,4 @@
 import { useState } from 'react';
-import { useWeb3React } from '@web3-react/core';
-import { CONTRACT_ADDRESS, CONTRACT_ABI } from './config';
 import { fileDownload } from './FileManage';
 
 import {
@@ -12,48 +10,76 @@ import {
   ModalBody,
   ModalCloseButton,
   Button,
+  Progress,
+  NumberInput,
+  NumberInputField,
+  NumberInputStepper,
+  NumberIncrementStepper,
+  NumberDecrementStepper,
+  Box,
+  Text,
+  Grid,
+  GridItem,
 } from '@chakra-ui/react'
 
-const TokenDownload = ({isOpen, onClose, tokenId}) => {
-  const [log, setLog] = useState('');
-  const [id, setID] = useState('');
+const TokenDownload = ({isOpen, onClose, downTokenId, setDownTokenId}) => {
+  const [progress, setProgress] = useState(0);
+  const [msg, setMsg] = useState('');
 
-  async function download(){
-    if(!active)
-      return;
-    const contract = new library.eth.Contract(CONTRACT_ABI, CONTRACT_ADDRESS, {from:account});
-    setLog("start contract");
-    try{
-      const key = await contract.methods.tokenKEY(id).call();
-      const uri = await contract.methods.tokenURI(id).call();
-      await fileDownload(key, uri, (a,b) => {setLog((a/b*100).toFixed())});
-    } catch(err){
-      console.log(err);
-      setLog("contract failed");
-    }
+  function processLog(msg, p, toP) {
+    setMsg(msg);
+    setProgress((p/toP*100).toFixed());
   }
 
-  const {
-    library,
-    account,
-    active,
-  } = useWeb3React();
+  function onCloseClick() {
+    onClose();
+    setMsg('');
+    setProgress(0);
+  }
+
+  async function download(){
+    try{
+      const result = await fileDownload(downTokenId, processLog);
+      if(!result)
+        setMsg("Failed");
+    } catch(err) {
+      setMsg("Failed");
+    }
+    setMsg("Success");
+  }
+
 
   return (
-    <Modal closeOnOverlayClick={false} isOpen={isOpen} onClose={onClose}>
+    <Modal closeOnOverlayClick={false} isOpen={isOpen} onClose={onCloseClick}>
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>Create your account</ModalHeader>
+        <ModalHeader>Download Audio</ModalHeader>
         <ModalCloseButton />
         <ModalBody pb={6}>
-          This is Test
+          <Box py={{base:5}}>
+            Download Token ID
+            <NumberInput defaultValue={downTokenId} onChange={(e) => setDownTokenId(e)}>
+              <NumberInputField />
+              <NumberInputStepper>
+                <NumberIncrementStepper />
+                <NumberDecrementStepper />
+              </NumberInputStepper>
+            </NumberInput>
+          </Box>
+          <Box py={{base:5}}>
+          <Grid gap={4}>
+            <GridItem colSpan={1}><Text>{msg}</Text></GridItem> 
+            <GridItem colSpan={1}><Progress value={progress} size='lg'/></GridItem>
+          </Grid>
+          </Box>
+          
         </ModalBody>
 
         <ModalFooter>
-          <Button colorScheme='blue' mr={3}>
-            Save
+          <Button colorScheme='blue' mr={3} onClick={download}>
+            Start Download
           </Button>
-          <Button onClick={onClose}>Cancel</Button>
+          <Button onClick={onCloseClick}>Cancel</Button>
         </ModalFooter>
       </ModalContent>
     </Modal>

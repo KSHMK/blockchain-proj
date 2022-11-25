@@ -1,38 +1,69 @@
 import { useEffect, useState } from 'react';
-import { TokenListView } from './TokenList';
+import { useDisclosure } from '@chakra-ui/react';
+import { connAccount, isConnected } from './ContractManage';
+
 import NavBar from './Navbar';
 import LoginPage from './LoginPage';
+import TokenListView from './TokenList';
+import TokenUpload from './TokenUpload';
 import TokenDownload from './TokenDownload';
-import { isConnected } from './ContractManage';
-import { useDisclosure } from '@chakra-ui/react';
+
+
 
 const App = () => {
   const [navState, setNavState] = useState('login');
+  const [downTokenId, setDownTokenId] = useState(0);
+  const [listUpdateToggle, setListUpdateToggle] = useState(false);
+  const [currentAccount, setcurAccount] = useState('');
+
   const { isOpen:isOpenDownload, onToggle:onOpenDownload, onClose:onCloseDownload } = useDisclosure()
   const { isOpen:isOpenUpload, onOpen:onOpenUpload, onClose:onCloseUpload } = useDisclosure()
   
+  const onOpenUploadFinish = () => {
+    setListUpdateToggle(!listUpdateToggle);
+    onCloseUpload();
+  }
+
+  const accountChangeHandler = (account) => {
+    setcurAccount(account[0])
+    setListUpdateToggle(!listUpdateToggle);
+  }
+
+
   useEffect(() => {
+    if(navState === 'login')
+      return;
     if(navState === 'download')
       onOpenDownload();
     if(navState === 'upload')
       onOpenUpload();
-  },[navState])
+    setNavState('list');
+  },[navState, onOpenDownload, onOpenUpload])
 
   useEffect(() => {
     async function checkConnect() {
-      if(await isConnected())
+      const curAcnt = await isConnected();
+      console.log(curAcnt);
+      if(curAcnt){
+        await connAccount(accountChangeHandler);
         setNavState('list');
+        setcurAccount(curAcnt);
+        return;
+      }
     }
     checkConnect()
-  },[])
+  })
 
   return (
     <>
-      <NavBar navState={navState} setNavState={setNavState} />
+      <NavBar navState={navState} setNavState={setNavState} currentAccount={currentAccount} />
       {
-        navState === 'login' ? <LoginPage setNavState={setNavState}/> : <TokenListView onOpenDownload={onOpenDownload} />
+        navState !== 'login' ? <TokenListView listUpdateToggle={listUpdateToggle} onOpenDownload={onOpenDownload} setDownTokenId={setDownTokenId} /> :
+        <LoginPage setNavState={setNavState} accountChangeHandler={accountChangeHandler} />
+        
       }
-      <TokenDownload isOpen={isOpenDownload} onClose={onCloseDownload} />
+      <TokenUpload isOpen={isOpenUpload} onClose={onOpenUploadFinish} />
+      <TokenDownload isOpen={isOpenDownload} onClose={onCloseDownload} downTokenId={downTokenId} setDownTokenId={setDownTokenId} />
     </>
   )
 }

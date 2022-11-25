@@ -7,10 +7,10 @@ import {
 } from '@chakra-ui/react';
 import { connAccount } from './ContractManage';
 
-export default function LoginPage({setNavState}) {
+export default function LoginPage({setNavState, accountChangeHandler}) {
 
   const connect = async () => {
-    if(await connAccount())
+    if(await connAccount(accountChangeHandler))
       setNavState('list');
   }
 
