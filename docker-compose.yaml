@@ -7,7 +7,6 @@ services:
     ports:
       - "8080:80"
     volumes:
-      - ./build/:/src
-      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./build/:/usr/share/nginx/html:ro
 
 
