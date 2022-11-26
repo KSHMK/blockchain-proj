@@ -15,7 +15,6 @@ import {
 export const TokenListView = ({listUpdateToggle, onOpenDownload, setDownTokenId}) => {
   
   const [list, setList] = useState([])
-  let flag=false;
 
   async function clickRow(tokenId) {
     setDownTokenId(tokenId);
@@ -23,9 +22,6 @@ export const TokenListView = ({listUpdateToggle, onOpenDownload, setDownTokenId}
   }
 
   async function viewList() {
-    if(flag)
-      return;
-    flag = true;
     getTokenList()
       .then((data) => {setList(data);})
       .catch((err) => console.log(err));
@@ -33,7 +29,7 @@ export const TokenListView = ({listUpdateToggle, onOpenDownload, setDownTokenId}
 
   useEffect(() => {
     viewList();
-  }, [listUpdateToggle, viewList]);
+  }, [listUpdateToggle]);
 
   return (
     <Box 

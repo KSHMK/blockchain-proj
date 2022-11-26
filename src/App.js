@@ -43,7 +43,7 @@ const App = () => {
   useEffect(() => {
     async function checkConnect() {
       const curAcnt = await isConnected();
-      console.log(curAcnt);
+      
       if(curAcnt){
         await connAccount(accountChangeHandler);
         setNavState('list');
@@ -52,7 +52,7 @@ const App = () => {
       }
     }
     checkConnect()
-  })
+  }, [])
 
   return (
     <>

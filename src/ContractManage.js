@@ -10,7 +10,7 @@ export const isConnected = async () => {
     return false;
   }
   const account = await window.ethereum.request({ method: 'eth_accounts' });
-  console.log(account);
+  
   if(account.length === 0)
     return false;
   return account[0];
