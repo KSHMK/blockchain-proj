@@ -25,6 +25,7 @@ import {
 const TokenDownload = ({isOpen, onClose, downTokenId, setDownTokenId}) => {
   const [progress, setProgress] = useState(0);
   const [msg, setMsg] = useState('');
+  const [isDownload, setIsDownload] = useState(false);
 
   function processLog(msg, p, toP) {
     setMsg(msg);
@@ -32,20 +33,29 @@ const TokenDownload = ({isOpen, onClose, downTokenId, setDownTokenId}) => {
   }
 
   function onCloseClick() {
+    if(isDownload)
+      return;
     onClose();
     setMsg('');
     setProgress(0);
   }
 
   async function download(){
+    if(isDownload)
+      return;
+    setIsDownload(true);
     try{
       const result = await fileDownload(downTokenId, processLog);
+      
       if(!result)
         setMsg("Failed");
+      else
+        setMsg("Success");
     } catch(err) {
       setMsg("Failed");
     }
-    setMsg("Success");
+    setIsDownload(false);
+
   }
 
 
@@ -76,10 +86,15 @@ const TokenDownload = ({isOpen, onClose, downTokenId, setDownTokenId}) => {
         </ModalBody>
 
         <ModalFooter>
-          <Button colorScheme='blue' mr={3} onClick={download}>
+          <Button 
+          isLoading={isDownload}
+          loadingText='Downloading'
+          colorScheme='blue' 
+          mr={3} 
+          onClick={download}>
             Start Download
           </Button>
-          <Button onClick={onCloseClick}>Cancel</Button>
+          <Button isDisabled={isDownload} onClick={onCloseClick}>Cancel</Button>
         </ModalFooter>
       </ModalContent>
     </Modal>

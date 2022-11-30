@@ -24,7 +24,8 @@ const ContractUpload = ({isOpen, onClose}) => {
   const [msg, setMsg] = useState('');
   const [selectedFile, setSelectedFile] = useState();
   const [isSelected, setIsSelected] = useState(false);
-
+  const [isUpload, setIsUpload] = useState(false);
+  
 
   const changeHandler = (event) => {
     if(event.target.files[0] === undefined){
@@ -36,6 +37,8 @@ const ContractUpload = ({isOpen, onClose}) => {
   };
 
   function onCloseClick() {
+    if(isUpload)
+      return;
     onClose();
     setMsg('');
     setProgress(0);
@@ -47,16 +50,20 @@ const ContractUpload = ({isOpen, onClose}) => {
   }
 
   async function upload(){
-    if(!isSelected)
+    if(!isSelected || isUpload)
       return;
     
+    setIsUpload(true);
     try{
-      await fileUpload(selectedFile, processLog);
+      if(await fileUpload(selectedFile, processLog))
+        setMsg("Success");
+      else
+        setMsg("Failed");
     } catch(err) {
       setMsg("Failed");
-      return;
     }
-    setMsg("Success");
+    setIsUpload(false);
+    
   }
 
   return (
@@ -80,10 +87,15 @@ const ContractUpload = ({isOpen, onClose}) => {
         </ModalBody>
 
         <ModalFooter>
-          <Button colorScheme='blue' mr={3} onClick={upload}>
+          <Button 
+          isLoading={isUpload}
+          loadingText='Uploading'
+          colorScheme='blue' 
+          mr={3} 
+          onClick={upload}>
             Start Upload
           </Button>
-          <Button onClick={onCloseClick}>Cancel</Button>
+          <Button isDisabled={isUpload} onClick={onCloseClick}>Cancel</Button>
         </ModalFooter>
       </ModalContent>
     </Modal>
