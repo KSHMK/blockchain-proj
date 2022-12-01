@@ -5,13 +5,19 @@ import {
   Button,
   Stack,
   Link,
+  FormControl,
+  FormLabel,
+  Input,
+  Icon,
+  Checkbox,
   Popover,
   PopoverTrigger,
   useColorModeValue,
   useBreakpointValue,
 } from '@chakra-ui/react';
+import { BiDownload, BiUpload } from "react-icons/bi";
 
-export default function NavBar({navState, setNavState, currentAccount}) {
+export default function NavBar({navState, setNavState, currentAccount, InputLeftElement, InputGroup}) {
   
   return (
     <Box>
@@ -29,7 +35,9 @@ export default function NavBar({navState, setNavState, currentAccount}) {
           <Text
             textAlign={useBreakpointValue({ base: 'center', md: 'left' })}
             fontFamily={'heading'}
-            color={useColorModeValue('gray.800', 'white')}>
+            fontWeight="bold"
+            fontSize={'3xl'}
+            color={useColorModeValue('twitter.500', 'white')}>
             Audio Head
           </Text>
           
@@ -52,7 +60,7 @@ export default function NavBar({navState, setNavState, currentAccount}) {
               <Button
                 as={'a'}
                 fontSize={'sm'}
-                fontWeight={400}
+                fontWeight={500}
                 pointerEvents={'none'}
                 href={'#'}>
                 Current Account: {currentAccount}
@@ -66,31 +74,80 @@ export default function NavBar({navState, setNavState, currentAccount}) {
 }
 
 const DesktopNav = ({setNavState}) => {
-  const linkColor = useColorModeValue('gray.600', 'gray.200');
-  const linkHoverColor = useColorModeValue('gray.800', 'white');
+  const linkColor = useColorModeValue('gray.800', 'twitter.500');
+  const linkHoverColor = useColorModeValue('cyan.500', 'white');
   
   return (
+    /*
     <Stack direction={'row'} spacing={4}>
       {NAV_ITEMS.map((navItem) => (
         <Box key={navItem.label}>
           <Popover trigger={'hover'} placement={'bottom-start'}>
             <PopoverTrigger>
-              <Link
-                p={2}
+              <Button
+                leftIcon={<BiDownload />}
+                p={4}
+                size={'lg'}
                 onClick={() => {setNavState(navItem.state)}}
-                fontSize={'sm'}
+                fontSize={'larger'}
                 fontWeight={500}
                 color={linkColor}
-                _hover={{
-                  textDecoration: 'none',
-                  color: linkHoverColor,
-                }}>
+                colorScheme='twitter'
+                variant={'ghost'}
+                >
                 {navItem.label}
-              </Link>
+              </Button>
+              
             </PopoverTrigger>
           </Popover>
         </Box>
       ))}
+    </Stack>
+    */
+   // mapping 없앰 => 각각 icon 추가하려고
+    <Stack direction={'row'} spacing={4}>
+    
+        <Box key={'Upload Audio'}>
+          <Popover trigger={'hover'} placement={'bottom-start'}>
+            <PopoverTrigger>
+              <Button
+                leftIcon={<BiUpload />}                
+                p={4}
+                size={'lg'}
+                onClick={() => {setNavState('upload')}}
+                fontSize={'larger'}
+                fontWeight={500}
+                color={linkColor}
+                colorScheme='twitter'
+                variant={'ghost'}
+                >
+                Upload Audio
+              </Button>
+              
+            </PopoverTrigger>
+          </Popover>
+        </Box>
+
+        <Box key={'Upload Audio'}>
+          <Popover trigger={'hover'} placement={'bottom-start'}>
+            <PopoverTrigger>
+              <Button
+                leftIcon={<BiDownload />}                
+                p={4}
+                size={'lg'}
+                onClick={() => {setNavState('download')}}
+                fontSize={'larger'}
+                fontWeight={500}
+                color={linkColor}
+                colorScheme='twitter'
+                variant={'ghost'}
+                >
+                Download Audio
+              </Button>              
+            </PopoverTrigger>
+          </Popover>
+        </Box>
+
     </Stack>
   );
 };

@@ -37,13 +37,13 @@ export const TokenListView = ({listUpdateToggle, onOpenDownload, setDownTokenId}
     overflowY="scroll"
     px={{base:20}}
     py={{base:10}}>
-      <Heading py={{base:5}}>Token List</Heading>
-      <Table>
+      <Heading py={{base:5}}> Token List</Heading>
+      <Table size={'lg'}>
         <Thead>
           <Tr>
-            <Th>Token Id</Th>
-            <Th>Name</Th>
-            <Th>Hash</Th>
+            <Th fontWeight={'bold'} fontSize={'md'}>Token Id</Th>
+            <Th fontWeight={'bold'} fontSize={'md'}>Name</Th>
+            <Th fontWeight={'bold'} fontSize={'md'}>Hash</Th>
           </Tr>
         </Thead>
         <Tbody>
@@ -58,7 +58,7 @@ export const TokenListView = ({listUpdateToggle, onOpenDownload, setDownTokenId}
                 </Tr>
               )
             })
-          : <Tr><Td colSpan={3}>None</Td></Tr>
+          : <Tr><Td colSpan={3} fontWeight={'bold'} fontSize={'lg'}>None</Td></Tr>
           
         }
         </Tbody>
