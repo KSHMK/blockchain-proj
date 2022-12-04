@@ -30,7 +30,10 @@ export const connAccount = async (handler) => {
 
   window.ethereum.on('accountsChanged', handler);
   if(await isConnected())
-    return true;
+    {
+      getTokenList();
+      return true;
+    }
   
   try {
     await window.ethereum.request({ method: 'eth_requestAccounts' });
@@ -62,9 +65,11 @@ export const setToken = async (hash, key, path) => {
 
 export const getTokenList = async () => {
   const account = await isConnected();
+  
   if(!account)
     return [];
   const lib = new Web3(window.ethereum);
+
   
   const contract = new lib.eth.Contract(CONTRACT_ABI, CONTRACT_ADDRESS, {from:account});
   const tlist = await contract.methods.tokenList().call();
@@ -77,7 +82,6 @@ export const getTokenList = async () => {
       name:metadata.name
     });
   };
-  
   return outlist;
 }
 
