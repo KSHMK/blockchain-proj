@@ -15,9 +15,10 @@ import {
   useColorModeValue,
   useBreakpointValue,
 } from '@chakra-ui/react';
-import { BiDownload, BiUpload } from "react-icons/bi";
+import { BiDownload, BiUpload, BiShieldQuarter } from "react-icons/bi";
+import { getAdmin } from './ContractManage';
 
-export default function NavBar({navState, setNavState, currentAccount, InputLeftElement, InputGroup}) {
+export default function NavBar({navState, setNavState, currentAccount, isAdmin}) {
   
   return (
     <Box>
@@ -44,7 +45,7 @@ export default function NavBar({navState, setNavState, currentAccount, InputLeft
           { 
             navState !== 'login' ? (
             <Flex display={{ base: 'none', md: 'flex' }} ml={10}>
-              <DesktopNav setNavState={setNavState}/>
+              <DesktopNav setNavState={setNavState} isAdmin={isAdmin}/>
             </Flex>
             ) : <></>
           }
@@ -73,7 +74,7 @@ export default function NavBar({navState, setNavState, currentAccount, InputLeft
   );
 }
 
-const DesktopNav = ({setNavState}) => {
+const DesktopNav = ({setNavState, isAdmin}) => {
   const linkColor = useColorModeValue('gray.800', 'twitter.500');
   const linkHoverColor = useColorModeValue('cyan.500', 'white');
   
@@ -128,7 +129,7 @@ const DesktopNav = ({setNavState}) => {
           </Popover>
         </Box>
 
-        <Box key={'Upload Audio'}>
+        <Box key={'Download Audio'}>
           <Popover trigger={'hover'} placement={'bottom-start'}>
             <PopoverTrigger>
               <Button
@@ -147,20 +148,31 @@ const DesktopNav = ({setNavState}) => {
             </PopoverTrigger>
           </Popover>
         </Box>
-
+        {
+          isAdmin &&
+            <Box key={'Admin Page'}>
+              <Popover trigger={'hover'} placement={'bottom-start'}>
+                <PopoverTrigger>
+                  <Button
+                    leftIcon={<BiShieldQuarter/>}                
+                    p={4}
+                    size={'lg'}
+                    onClick={() => {setNavState('admin')}}
+                    fontSize={'larger'}
+                    fontWeight={500}
+                    color={linkColor}
+                    colorScheme='twitter'
+                    variant={'ghost'}
+                    >
+                    Admin Page
+                  </Button>              
+                </PopoverTrigger>
+              </Popover>
+            </Box>
+          
+        }
     </Stack>
   );
 };
 
 
-const NAV_ITEMS = [
-  {
-    label: 'Upload Audio',
-    state: 'upload',
-  },
-  {
-    label: 'Download Audio',
-    state: 'download',
-  },
-
-];

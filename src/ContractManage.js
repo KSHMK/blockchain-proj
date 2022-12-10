@@ -9,14 +9,15 @@ export const isConnected = async () => {
   if (!window.ethereum.isMetaMask) {
     return false;
   }
-  const account = await window.ethereum.request({ method: 'eth_accounts' });
+  const lib = new Web3(window.ethereum);
+  const account = await lib.eth.getAccounts();
   
   if(account.length === 0)
     return false;
   return account[0];
 }
 
-export const connAccount = async (handler) => {
+export const connAccount = async () => {
 
   if (typeof window.ethereum === 'undefined') {
     window.open('https://metamask.io/download.html');
@@ -28,7 +29,7 @@ export const connAccount = async (handler) => {
     return false;
   }
 
-  window.ethereum.on('accountsChanged', handler);
+  
   if(await isConnected())
     {
       getTokenList();
@@ -99,6 +100,22 @@ export const getTokenKeyURI = async (id) => {
       key:key,
       uri:uri
     };
+  } catch(err){
+    console.log(err);
+    return undefined;
+  }
+}
+
+export const getAdmin = async () => {
+  const account = await isConnected();
+  if(!account)
+    return undefined;
+  const lib = new Web3(window.ethereum);
+  
+  const contract = new lib.eth.Contract(CONTRACT_ABI, CONTRACT_ADDRESS, {from:account});
+  try {
+    const owner = await contract.methods.owner().call();
+    return owner;
   } catch(err){
     console.log(err);
     return undefined;

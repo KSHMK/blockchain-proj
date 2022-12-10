@@ -41,7 +41,7 @@ export default function LoginPage({setNavState, accountChangeHandler}) {
           <Button
             onClick={() => connect()}
             alignSelf={'center'}
-            Flex h="6vh"
+            flex h="6vh"
             fontSize={'2xl'}
             fontWeight="bold"
             rounded={'full'}
