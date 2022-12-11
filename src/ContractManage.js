@@ -121,3 +121,70 @@ export const getAdmin = async () => {
     return undefined;
   }
 }
+
+export const withdraw = async () => {
+  const account = await isConnected();
+  if(!account)
+    return false;
+  const lib = new Web3(window.ethereum);
+  
+  const contract = new lib.eth.Contract(CONTRACT_ABI, CONTRACT_ADDRESS, {from:account});
+  try {
+    await contract.methods.withdraw().send();
+    return true;
+  } catch(err){
+    console.log(err);
+    return false;
+  }
+}
+
+export const grantRole = async (dest) => {
+  const account = await isConnected();
+  if(!account)
+    return false;
+  const lib = new Web3(window.ethereum);
+  
+  const contract = new lib.eth.Contract(CONTRACT_ABI, CONTRACT_ADDRESS, {from:account});
+  try {
+    const role = await contract.methods.VIEW_SECERET_ROLE().call();
+    await contract.methods.grantRole(role, dest).send();
+    return true;
+  } catch(err){
+    console.log(err);
+    return false;
+  }
+}
+
+export const revokeRole = async (dest) => {
+  const account = await isConnected();
+  if(!account)
+    return false;
+  const lib = new Web3(window.ethereum);
+  
+  const contract = new lib.eth.Contract(CONTRACT_ABI, CONTRACT_ADDRESS, {from:account});
+  try {
+    const role = await contract.methods.VIEW_SECERET_ROLE().call();
+    await contract.methods.revokeRole(role, dest).send();
+    return true;
+  } catch(err){
+    console.log(err);
+    return false;
+  }
+}
+
+
+export const setPrice = async (price) => {
+  const account = await isConnected();
+  if(!account)
+    return false;
+  const lib = new Web3(window.ethereum);
+  
+  const contract = new lib.eth.Contract(CONTRACT_ABI, CONTRACT_ADDRESS, {from:account});
+  try {
+    await contract.methods.setPrice(price).send();
+    return true;
+  } catch(err){
+    console.log(err);
+    return false;
+  }
+}
